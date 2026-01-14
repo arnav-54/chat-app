@@ -1,0 +1,107 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  username  String   @unique
+  email     String   @unique
+  phone     String?
+  status    String   @default("Available")
+  password  String
+  avatar    String   @default("")
+  isOnline  Boolean  @default(false)
+  lastSeen  DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sentMessages     Message[]
+  chatParticipants ChatParticipant[]
+  adminChats       Chat[]
+  reactions        Reaction[]
+  assignedTasks    Task[]
+  statuses         Status[]
+}
+
+model Status {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  type      String   @default("text") // "text" or "image"
+  mediaUrl  String?
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId
+}
+
+model Chat {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  isGroup      Boolean  @default(false)
+  avatar       String   @default("")
+  summary      String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  participants ChatParticipant[]
+  admin        User?     @relation(fields: [adminId], references: [id])
+  adminId      String?   @db.ObjectId
+  messages     Message[]
+  keyPoints    String[]
+  tasks        Task[]
+}
+
+model ChatParticipant {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  
+  user   User   @relation(fields: [userId], references: [id])
+  userId String @db.ObjectId
+  chat   Chat   @relation(fields: [chatId], references: [id])
+  chatId String @db.ObjectId
+
+  @@unique([userId, chatId])
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  type      String   @default("text")
+  fileUrl   String?
+  fileName  String?
+  createdAt DateTime @default(now())
+
+  sender      User          @relation(fields: [senderId], references: [id])
+  senderId    String        @db.ObjectId
+  chat        Chat          @relation(fields: [chatId], references: [id])
+  chatId      String        @db.ObjectId
+  reactions   Reaction[]
+}
+
+model Reaction {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  emoji     String
+
+  user      User    @relation(fields: [userId], references: [id])
+  userId    String  @db.ObjectId
+  message   Message @relation(fields: [messageId], references: [id])
+  messageId String  @db.ObjectId
+
+  @@unique([userId, messageId])
+}
+
+model Task {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  completed Boolean @default(false)
+
+  chat         Chat   @relation(fields: [chatId], references: [id])
+  chatId       String @db.ObjectId
+  assignedTo   User?  @relation(fields: [assignedToId], references: [id])
+  assignedToId String? @db.ObjectId
+}
