@@ -5,28 +5,28 @@ A full-stack real-time chat application with AI-powered conversation insights, b
 ## Features
 
 ### Core Messaging
-- ✅ Real-time messaging with Socket.IO
-- ✅ Individual and group chats
-- ✅ Message reactions (👍, ❤️, 😂)
-- ✅ Typing indicators
-- ✅ Online/offline status
-- ✅ Message timestamps
-- 🔄 Media sharing (Cloudinary integration)
-- 🔄 Read receipts
+- Real-time messaging with Socket.IO
+- Individual and group chats
+- Message reactions (👍, ❤️, 😂)
+- Typing indicators
+- Online/offline status
+- Message timestamps
+- Media sharing (Cloudinary integration)
+- Read receipts
 
 ### Smart Context Memory (AI Features)
-- ✅ Conversation summarization with OpenAI
-- ✅ Key points extraction
-- ✅ Task identification
-- ✅ Chat statistics
-- 🔄 Topic timeline analysis
-- 🔄 Smart search through conversation history
+- Conversation summarization with OpenAI
+- Key points extraction
+- Task identification
+- Chat statistics
+- Topic timeline analysis
+- Smart search through conversation history
 
 ### Authentication & Profile
-- ✅ User registration/login
-- ✅ JWT authentication
-- ✅ Profile management
-- 🔄 Avatar uploads
+- User registration/login
+- JWT authentication
+- Profile management
+- Avatar uploads
 
 ## Tech Stack
 
