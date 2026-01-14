@@ -696,6 +696,57 @@ body {
   color: var(--primary-accent);
 }
 
+/* Empty State - Centered Branding */
+.empty-state-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-app);
+  padding: 40px;
+  text-align: center;
+  /* Center all text */
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 600px;
+}
+
+.empty-state-icon {
+  margin-bottom: 25px;
+  opacity: 0.8;
+}
+
+.empty-state-content h1 {
+  font-size: 42px;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 20px;
+}
+
+.empty-state-content p {
+  color: var(--text-secondary);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.empty-state-footer {
+  margin-top: auto;
+  padding-bottom: 40px;
+  color: var(--text-lighter);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;

@@ -5,15 +5,19 @@ import api from '../services/api';
 const Login = ({ switchToRegister }) => {
   const [formData, setFormData] = useState({ identifier: '', password: '' });
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     try {
       const response = await api.post('/auth/login', formData);
       login(response.data.token, response.data.user);
     } catch (error) {
       setError(error.response?.data?.message || 'Login failed');
+      setLoading(false);
     }
   };
 
@@ -58,8 +62,8 @@ const Login = ({ switchToRegister }) => {
             />
           </div>
 
-          <button type="submit" className="btn-primary">
-            Sign In
+          <button type="submit" className="btn-primary" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
           <p className="auth-footer">
