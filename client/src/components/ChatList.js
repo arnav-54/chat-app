@@ -76,7 +76,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
   return (
     <div className="sidebar">
       {/* Profile Panel */}
-      <div className={`sidebar - panel ${activePanel === 'profile' ? 'active' : ''} `}>
+      <div className={`sidebar-panel ${activePanel === 'profile' ? 'active' : ''}`}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
@@ -112,7 +112,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
       </div>
 
       {/* Status Panel */}
-      <div className={`sidebar - panel ${activePanel === 'status' ? 'active' : ''} `}>
+      <div className={`sidebar-panel ${activePanel === 'status' ? 'active' : ''}`}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
