@@ -124,20 +124,21 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
 
 
   return (
-    <div className="main-chat" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+    <div className="main-chat">
       <div className="chat-header">
-        <button className="btn-icon" onClick={onBack} style={{ marginRight: '10px' }}>
+        <button className="btn-icon" onClick={onBack} style={{ marginRight: '15px' }}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
         </button>
         <div className="avatar">
           {chat.isGroup ? chat.name[0].toUpperCase() : (getOtherUser()?.avatar ? <img src={getOtherUser().avatar} alt="avatar" /> : getChatName()[0].toUpperCase())}
+          {isOnline() && <div className="online-indicator"></div>}
         </div>
-        <div className="chat-info" style={{ marginLeft: '15px' }}>
+        <div className="chat-info">
           <div className="chat-name">{getChatName()}</div>
           <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             {chat.isGroup
               ? `${chat.participants?.length} members`
-              : (isOnline() ? <span style={{ color: 'var(--primary-accent)', fontWeight: '600' }}>online</span> : 'offline')}
+              : (isOnline() ? <span style={{ color: 'var(--primary-accent)', fontWeight: '600' }}>online</span> : 'last seen recently')}
           </div>
         </div>
       </div>
@@ -146,17 +147,17 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
         {messages.map(message => (
           <div key={message._id || message.id} className={`message ${message.sender?.id === user.id ? 'own' : 'other'}`}>
             {message.sender?.id !== user.id && chat.isGroup && (
-              <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--primary-accent)', marginBottom: '4px' }}>
+              <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primary-accent)', marginBottom: '4px' }}>
                 {message.sender?.username}
               </div>
             )}
 
             <div className="message-content">
               {message.type === 'image' ? (
-                <img src={message.fileUrl} alt="sent" style={{ maxWidth: '100%', borderRadius: '8px', cursor: 'pointer' }} onClick={() => window.open(message.fileUrl)} />
+                <img src={message.fileUrl} alt="sent" style={{ maxWidth: '100%', borderRadius: '12px', cursor: 'pointer', display: 'block' }} onClick={() => window.open(message.fileUrl)} />
               ) : message.type === 'file' ? (
-                <a href={message.fileUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'inherit', textDecoration: 'none' }}>
-                  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"></path></svg>
+                <a href={message.fileUrl} target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'inherit', textDecoration: 'none', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px' }}>
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--primary-accent)"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6z"></path></svg>
                   <span>{message.fileName || 'Attachment'}</span>
                 </a>
               ) : (
@@ -170,7 +171,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
           </div>
         ))}
         {typing.length > 0 && (
-          <div style={{ color: 'var(--primary-accent)', fontSize: '13px', fontStyle: 'italic', paddingLeft: '10px' }}>
+          <div style={{ color: 'var(--primary-accent)', fontSize: '13px', fontStyle: 'italic', paddingLeft: '10px', marginBottom: '10px' }}>
             {typing.map(t => t.username).join(', ')} is typing...
           </div>
         )}
@@ -179,10 +180,10 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
 
       <form className="message-input-container" onSubmit={handleSendMessage}>
         <button type="button" className="btn-icon-chat" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5s.67 1.5 1.5 1.5zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path></svg>
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5s.67 1.5 1.5 1.5zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path></svg>
         </button>
         <button type="button" className="btn-icon-chat" onClick={() => fileInputRef.current.click()}>
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M1.816 15.556v.002c0 1.502.584 2.912 1.646 3.972s2.47 1.647 3.971 1.647a5.58 5.58 0 0 0 3.972-1.647l9.547-9.547a4.347 4.347 0 0 0-6.149-6.149l-9.547 9.547c-.521.521-.808 1.213-.808 1.948s.287 1.427.808 1.948c.521.521 1.214.807 1.948.807s1.427-.286 1.948-.807l7.424-7.424a.75.75 0 0 1 1.06 1.06l-7.424 7.424c-1.104 1.104-2.573 1.712-4.132 1.712s-3.028-.608-4.132-1.712c-1.104-1.104-1.712-2.573-1.712-4.132s.608-3.028 1.712-4.132l9.547-9.547a5.847 5.847 0 0 1 8.269 8.269l-9.547 9.547c-1.408 1.408-3.28 2.183-5.271 2.183s-3.863-.775-5.271-2.183l0-0.002z"></path></svg>
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor"><path d="M21.58 13.91l-9.85 9.85c-.39.39-1.03.39-1.42 0L.46 13.91c-.39-.39-.39-1.03 0-1.42L10.31 2.64c.39-.39 1.03-.39 1.42 0l9.85 9.85c.39.39.39 1.03 0 1.42zM11 7v10l5-5-5-5z"></path></svg>
         </button>
         <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
 
@@ -191,22 +192,22 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
             type="text"
             value={newMessage}
             onChange={handleTyping}
-            placeholder="Type a message"
+            placeholder="Type a message..."
             onBlur={handleStopTyping}
             onClick={() => setShowEmojiPicker(false)}
           />
         </div>
 
-        <button type="submit" className="btn-send-whatsapp" disabled={uploading}>
+        <button type="submit" className="btn-icon-chat" disabled={uploading} style={{ background: 'var(--primary-accent)', color: 'white', padding: '12px' }}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-            <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path>
           </svg>
         </button>
       </form>
 
       {showEmojiPicker && (
         <div style={{ position: 'absolute', bottom: '80px', left: '25px', zIndex: 100 }}>
-          <EmojiPicker onEmojiClick={(emojiData) => setNewMessage(prev => prev + emojiData.emoji)} />
+          <EmojiPicker theme="dark" onEmojiClick={(emojiData) => setNewMessage(prev => prev + emojiData.emoji)} />
         </div>
       )}
     </div>

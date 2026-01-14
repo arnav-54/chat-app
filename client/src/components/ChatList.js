@@ -65,7 +65,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
 
   const getChatName = (chat) => {
     if (chat.isGroup) return chat.name;
-    const otherParticipant = chat.participants?.find(p => p.user?.id !== user.id);
+    const otherParticipant = chat.participants?.find(p => (p.user?.id || p.user?._id) !== user.id);
     return otherParticipant?.user?.username || 'Unknown User';
   };
 
@@ -79,31 +79,31 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
       <div className={`sidebar-panel ${activePanel === 'profile' ? 'active' : ''}`}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
           </button>
           <h3>Profile</h3>
         </div>
         <div className="panel-content">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '28px 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px 0' }}>
             <div className="avatar avatar-large" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => avatarInputRef.current.click()}>
               {user?.avatar ? <img src={user.avatar} alt="Profile" /> : user?.username?.[0]?.toUpperCase()}
-              {loading && <div style={{ position: 'absolute', inset: 0, background: 'rgba(255,255,255,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>...</div>}
+              {loading && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>...</div>}
             </div>
             <input type="file" ref={avatarInputRef} style={{ display: 'none' }} onChange={handleAvatarUpload} accept="image/*" />
           </div>
 
           <div className="profile-info-card">
-            <div className="profile-label">Your name</div>
+            <div className="profile-label">Your Name</div>
             <div className="profile-value">
               <input value={username} onChange={e => setUsername(e.target.value)} onBlur={handleUpdateProfile} />
             </div>
-            <p style={{ marginTop: '10px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-              This is not your username or pin. This name will be visible to your EchoChat contacts.
+            <p style={{ marginTop: '15px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
+              This name will be visible to your contacts and inside group chats.
             </p>
           </div>
 
           <div className="profile-info-card">
-            <div className="profile-label">About</div>
+            <div className="profile-label">About / Status</div>
             <div className="profile-value">
               <input value={statusText} onChange={e => setStatusText(e.target.value)} onBlur={handleUpdateProfile} />
             </div>
@@ -115,35 +115,39 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
       <div className={`sidebar-panel ${activePanel === 'status' ? 'active' : ''}`}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
+            <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
           </button>
-          <h3>Status</h3>
+          <h3>Updates</h3>
         </div>
-        <div className="panel-content" style={{ background: 'white' }}>
-          <div className="status-item" onClick={() => setShowStatusModal(true)}>
-            <div className="status-circle" style={{ border: 'none' }}>
-              <div className="avatar">
-                {user?.avatar ? <img src={user.avatar} alt="Me" /> : user?.username?.[0]?.toUpperCase()}
-              </div>
+        <div className="panel-content">
+          <div className="status-item" onClick={() => setShowStatusModal(true)} style={{ marginBottom: '10px' }}>
+            <div className="status-circle">
+              {user?.avatar ? <img src={user.avatar} alt="Me" /> : user?.username?.[0]?.toUpperCase()}
             </div>
             <div className="chat-info">
               <div className="chat-name">My Status</div>
-              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Click to add status update</p>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Click to share an update</p>
             </div>
           </div>
 
           <div className="status-section-title">RECENT UPDATES</div>
-          {statuses.map(group => (
+          {statuses.length > 0 ? statuses.map(group => (
             <div key={group.user.id} className="status-item" onClick={() => alert(group.updates[0].content)}>
               <div className="status-circle">
                 <img src={group.user.avatar || 'https://via.placeholder.com/150'} alt="avatar" />
               </div>
               <div className="chat-info">
-                <div className="chat-name">{group.user.username}</div>
-                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Today at {new Date(group.updates[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                <div className="chat-name" style={{ color: 'white' }}>{group.user.username}</div>
+                <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                  {new Date(group.updates[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </p>
               </div>
             </div>
-          ))}
+          )) : (
+            <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-lighter)', fontSize: '14px' }}>
+              No recent updates from contacts.
+            </div>
+          )}
         </div>
       </div>
 
@@ -151,21 +155,21 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
         <div className="avatar avatar-small" onClick={() => setActivePanel('profile')} style={{ cursor: 'pointer' }}>
           {user?.avatar ? <img src={user.avatar} alt="Me" /> : user?.username?.[0]?.toUpperCase()}
         </div>
-        <div style={{ display: 'flex', gap: '15px' }}>
-          <button className="btn-icon" onClick={() => setActivePanel('status')}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 5a7 7 0 1 0 7 7 7 7 0 0 0-7-7zm0 12.5a5.5 5.5 0 1 1 5.5-5.5 5.5 5.5 0 0 1-5.5 5.5z"></path></svg>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn-icon" onClick={() => setActivePanel('status')} title="Status">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path><path d="M12.5 7h-1v6l5.25 3.15.75-1.23-4.5-2.67z"></path></svg>
           </button>
-          <button className="btn-icon" onClick={onNewChat}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19.005 3.17a.75.75 0 0 1 .77.724l.005.111v1.907h1.907a.75.75 0 0 1 .111 1.49l-.111.01h-1.907v1.907a.75.75 0 0 1-1.49.111l-.01-.111V7.411h-1.907a.75.75 0 0 1-.111-1.49l.111-.01h1.907V4.004a.75.75 0 0 1 .75-.75z"></path></svg>
+          <button className="btn-icon" onClick={onNewChat} title="New Chat">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
           </button>
-          <button className="btn-icon" onClick={onLogout}>
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M16 13v-2H7V9l-5 4 5 4v-2h9zM20 3h-9c-1.1 0-2 .9-2 2v4h2V5h9v14h-9v-4H9v4c0 1.1.9 2 2 2h9c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></svg>
+          <button className="btn-icon" onClick={onLogout} title="Logout">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></svg>
           </button>
         </div>
       </div>
 
       <div className="search-wrapper">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="#54656f"><path d="M15.009 13.805h-.636l-.22-.219a5.184 5.184 0 0 0 1.256-3.386 5.2 5.2 0 1 0-5.2 5.2 5.184 5.184 0 0 0 3.386-1.256l.22.219v.636l4.005 3.997 1.192-1.192-3.997-4.005zm-5.212 0c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"></path></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--text-lighter)"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
         <input placeholder="Search or start new chat" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
       </div>
 
@@ -194,9 +198,8 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
                 </div>
                 <div className="chat-bottom">
                   <div className="chat-preview">
-                    {chat.messages && chat.messages.length > 0 ? chat.messages[0].content : 'No messages yet'}
+                    {chat.messages && chat.messages.length > 0 ? chat.messages[0].content : 'Click to start chatting'}
                   </div>
-                  {/* Mock Unread Badge ("1") for demonstration if not active */}
                   {(activeChat?._id || activeChat?.id) !== (chat.id || chat._id) && (
                     <div className="unread-badge">1</div>
                   )}
