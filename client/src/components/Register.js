@@ -31,20 +31,7 @@ const Register = ({ switchToLogin }) => {
         <form className="auth-form" onSubmit={handleSubmit}>
           <h1>Register</h1>
 
-          {error && (
-            <div className="error-message" style={{
-              color: 'var(--danger)',
-              background: '#fff5f5',
-              padding: '12px 16px',
-              borderRadius: '10px',
-              marginBottom: '25px',
-              fontSize: '14px',
-              border: '1px solid #ffe3e3',
-              textAlign: 'center'
-            }}>
-              {error}
-            </div>
-          )}
+          {error && <div className="error-message">{error}</div>}
 
           <div className="form-group">
             <label htmlFor="username">Username</label>
@@ -94,18 +81,13 @@ const Register = ({ switchToLogin }) => {
             />
           </div>
 
-          <button type="submit" className="btn-primary" style={{ marginTop: '10px', height: '48px', fontSize: '16px', letterSpacing: '0.5px' }}>
+          <button type="submit" className="btn-primary-whatsapp">
             CREATE ACCOUNT
           </button>
 
-          <p className="auth-footer" style={{ marginTop: '30px', color: 'var(--text-secondary)', fontSize: '14px', textAlign: 'center' }}>
+          <p className="auth-footer">
             Already have an account?
-            <span
-              style={{ color: 'var(--primary-accent)', cursor: 'pointer', fontWeight: '600', marginLeft: '8px' }}
-              onClick={switchToLogin}
-            >
-              Login here
-            </span>
+            <button type="button" onClick={switchToLogin}>Login here</button>
           </p>
         </form>
       </div>

@@ -3,10 +3,10 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import StatusModal from './StatusModal';
 
-const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat }) => {
+const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, onlineUsers }) => {
   const { user, token, login } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
-  const [activePanel, setActivePanel] = useState(null); // 'profile' or 'status'
+  const [activePanel, setActivePanel] = useState(null);
   const [statuses, setStatuses] = useState([]);
   const [myStatuses, setMyStatuses] = useState([]);
   const [username, setUsername] = useState(user?.username || '');
@@ -76,7 +76,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat }) => {
   return (
     <div className="sidebar">
       {/* Profile Panel */}
-      <div className={`sidebar-panel ${activePanel === 'profile' ? 'active' : ''}`}>
+      <div className={`sidebar - panel ${activePanel === 'profile' ? 'active' : ''} `}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
@@ -112,7 +112,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat }) => {
       </div>
 
       {/* Status Panel */}
-      <div className={`sidebar-panel ${activePanel === 'status' ? 'active' : ''}`}>
+      <div className={`sidebar - panel ${activePanel === 'status' ? 'active' : ''} `}>
         <div className="panel-header">
           <button className="btn-icon" onClick={() => setActivePanel(null)} style={{ color: 'white' }}>
             <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4l1.4 1.4L7.8 11H20v2H7.8l5.6 5.6L12 20l-8-8 8-8z"></path></svg>
@@ -169,23 +169,35 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat }) => {
         <input placeholder="Search or start new chat" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
       </div>
 
-      <div className="chat-list">
+      <div className="chats-list">
         {filteredChats.map(chat => {
           const chatName = getChatName(chat);
+          const otherUser = chat.isGroup ? null : chat.participants?.find(p => (p.user?.id || p.user?._id) !== user.id)?.user;
+          const isUserOnline = otherUser && (onlineUsers.includes(otherUser.id) || onlineUsers.includes(otherUser._id));
+
           return (
-            <div key={chat._id || chat.id} className={`chat-item ${activeChat?._id === chat._id || activeChat?.id === chat.id ? 'active' : ''}`} onClick={() => onChatSelect(chat)}>
+            <div key={chat._id || chat.id} className={`chat-item ${(activeChat?._id || activeChat?.id) === (chat.id || chat._id) ? 'active' : ''}`} onClick={() => onChatSelect(chat)}>
               <div className="avatar">
                 {!chat.isGroup ? (
-                  chat.participants?.find(p => p.user?.id !== user.id)?.user?.avatar ?
-                    <img src={chat.participants.find(p => p.user.id !== user.id).user.avatar} alt="avatar" /> :
+                  otherUser?.avatar ?
+                    <img src={otherUser.avatar} alt="avatar" /> :
                     chatName[0].toUpperCase()
                 ) : chat.name[0].toUpperCase()}
+                {isUserOnline && <div className="online-indicator"></div>}
               </div>
-              <div className="chat-info">
-                <div className="chat-header-row">
+              <div className="chat-details">
+                <div className="chat-top">
                   <div className="chat-name">{chatName}</div>
-                  {/* Mock Unread Badge ("1 pointing") for non-active chats */}
-                  {activeChat?._id !== chat._id && activeChat?.id !== chat.id && (
+                  <div className="chat-time">
+                    {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                  </div>
+                </div>
+                <div className="chat-bottom">
+                  <div className="chat-preview">
+                    {chat.messages && chat.messages.length > 0 ? chat.messages[0].content : 'No messages yet'}
+                  </div>
+                  {/* Mock Unread Badge ("1") for demonstration if not active */}
+                  {(activeChat?._id || activeChat?.id) !== (chat.id || chat._id) && (
                     <div className="unread-badge">1</div>
                   )}
                 </div>

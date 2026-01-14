@@ -46,6 +46,9 @@ io.on('connection', (socket) => {
 
   socket.on('join', (userId) => {
     activeUsers.set(userId, socket.id);
+    // Send the list of current online users to the user who just joined
+    socket.emit('onlineUsers', Array.from(activeUsers.keys()));
+    // Notify others that this user is now online
     socket.broadcast.emit('userOnline', userId);
   });
 

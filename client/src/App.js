@@ -18,6 +18,8 @@ const ChatApp = () => {
   const [showNewChatModal, setShowNewChatModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
   useEffect(() => {
     if (user) {
       socket.emit('join', user.id);
@@ -26,6 +28,18 @@ const ChatApp = () => {
   }, [user]);
 
   useEffect(() => {
+    socket.on('onlineUsers', (users) => {
+      setOnlineUsers(users);
+    });
+
+    socket.on('userOnline', (userId) => {
+      setOnlineUsers(prev => [...new Set([...prev, userId])]);
+    });
+
+    socket.on('userOffline', (userId) => {
+      setOnlineUsers(prev => prev.filter(id => id !== userId));
+    });
+
     socket.on('newMessage', (message) => {
       const chatID = activeChat?.id || activeChat?._id;
       if (chatID === message.chatId) {
@@ -59,6 +73,9 @@ const ChatApp = () => {
     });
 
     return () => {
+      socket.off('onlineUsers');
+      socket.off('userOnline');
+      socket.off('userOffline');
       socket.off('newMessage');
       socket.off('newChat');
     };
@@ -121,6 +138,7 @@ const ChatApp = () => {
         onChatSelect={handleChatSelect}
         onLogout={handleLogout}
         onNewChat={handleNewChat}
+        onlineUsers={onlineUsers}
       />
 
       <NewChatModal
@@ -136,6 +154,7 @@ const ChatApp = () => {
             messages={messages}
             setMessages={setMessages}
             onBack={handleBack}
+            onlineUsers={onlineUsers}
           />
           <AISidebar chat={activeChat} />
         </>
@@ -147,10 +166,10 @@ const ChatApp = () => {
                 <path d="M12 2C6.48 2 2 6.48 2 12c0 2.17.76 4.19 2.04 5.76L3 22l4.24-1.04C8.81 21.24 10.33 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.47 0-2.84-.42-4.01-1.15l-.29-.18-2.5.61.61-2.5-.18-.29C4.92 14.84 4.5 13.47 4.5 12c0-4.14 3.36-7.5 7.5-7.5s7.5 3.36 7.5 7.5-3.36 7.5-7.5 7.5z" />
               </svg>
             </div>
-            <h1>Echo Messaging Pro</h1>
+            <h1>EchoChat for Web</h1>
             <p>
-              Send and receive messages with smart context memory.<br />
-              All your conversations are protected with end-to-end encryption.
+              Send and receive messages without keeping your phone online.<br />
+              Use EchoChat on up to 4 linked devices and 1 phone at the same time.
             </p>
           </div>
           <div className="empty-state-footer">

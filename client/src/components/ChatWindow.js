@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import socket from '../services/socket';
 import api from '../services/api';
 
-const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
+const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
   const [newMessage, setNewMessage] = useState('');
   const [typing, setTyping] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
@@ -49,7 +49,6 @@ const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
       fileName: fileData?.name
     };
 
-    // Optimistic Update
     const tempId = Date.now().toString();
     const tempMessage = {
       _id: tempId,
@@ -107,7 +106,8 @@ const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
 
   const getOtherUser = () => {
     if (chat.isGroup) return null;
-    return chat.participants?.find(p => p.user?.id !== user.id)?.user;
+    const otherParticipant = chat.participants?.find(p => (p.user?.id || p.user?._id) !== user.id);
+    return otherParticipant?.user;
   };
 
   const getChatName = () => {
@@ -117,8 +117,11 @@ const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
 
   const isOnline = () => {
     if (chat.isGroup) return false;
-    return getOtherUser()?.isOnline;
+    const otherUser = getOtherUser();
+    if (!otherUser) return false;
+    return onlineUsers.includes(otherUser.id) || onlineUsers.includes(otherUser._id);
   };
+
 
   return (
     <div className="main-chat" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -175,10 +178,10 @@ const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
       </div>
 
       <form className="message-input-container" onSubmit={handleSendMessage}>
-        <button type="button" className="btn-icon" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
+        <button type="button" className="btn-icon-chat" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5s.67 1.5 1.5 1.5zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"></path></svg>
         </button>
-        <button type="button" className="btn-icon" onClick={() => fileInputRef.current.click()}>
+        <button type="button" className="btn-icon-chat" onClick={() => fileInputRef.current.click()}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M1.816 15.556v.002c0 1.502.584 2.912 1.646 3.972s2.47 1.647 3.971 1.647a5.58 5.58 0 0 0 3.972-1.647l9.547-9.547a4.347 4.347 0 0 0-6.149-6.149l-9.547 9.547c-.521.521-.808 1.213-.808 1.948s.287 1.427.808 1.948c.521.521 1.214.807 1.948.807s1.427-.286 1.948-.807l7.424-7.424a.75.75 0 0 1 1.06 1.06l-7.424 7.424c-1.104 1.104-2.573 1.712-4.132 1.712s-3.028-.608-4.132-1.712c-1.104-1.104-1.712-2.573-1.712-4.132s.608-3.028 1.712-4.132l9.547-9.547a5.847 5.847 0 0 1 8.269 8.269l-9.547 9.547c-1.408 1.408-3.28 2.183-5.271 2.183s-3.863-.775-5.271-2.183l0-0.002z"></path></svg>
         </button>
         <input type="file" ref={fileInputRef} style={{ display: 'none' }} onChange={handleFileUpload} />
@@ -188,28 +191,14 @@ const ChatWindow = ({ chat, messages, setMessages, onBack }) => {
             type="text"
             value={newMessage}
             onChange={handleTyping}
-            placeholder="Search or send a message"
+            placeholder="Type a message"
             onBlur={handleStopTyping}
             onClick={() => setShowEmojiPicker(false)}
           />
         </div>
 
-        <button type="submit" className="btn-send" disabled={uploading} style={{
-          background: 'var(--primary-gradient)',
-          color: 'white',
-          border: 'none',
-          width: '44px',
-          height: '44px',
-          borderRadius: '50%',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-          transition: 'all 0.2s',
-          marginLeft: '4px'
-        }}>
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" style={{ transform: 'translateX(2px)' }}>
+        <button type="submit" className="btn-send-whatsapp" disabled={uploading}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
             <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"></path>
           </svg>
         </button>
