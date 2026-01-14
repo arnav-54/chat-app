@@ -3,7 +3,7 @@ const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-// Get all statuses from users except current user
+
 router.get('/', auth, async (req, res) => {
     try {
         const now = new Date();
@@ -20,7 +20,6 @@ router.get('/', auth, async (req, res) => {
             orderBy: { createdAt: 'desc' }
         });
 
-        // Group statuses by user
         const groupedStatuses = statuses.reduce((acc, status) => {
             const userId = status.user.id;
             if (!acc[userId]) {
@@ -39,7 +38,6 @@ router.get('/', auth, async (req, res) => {
     }
 });
 
-// Post a new status
 router.post('/', auth, async (req, res) => {
     try {
         const { content, type, mediaUrl } = req.body;
@@ -67,7 +65,7 @@ router.post('/', auth, async (req, res) => {
     }
 });
 
-// Get my statuses
+
 router.get('/my', auth, async (req, res) => {
     try {
         const now = new Date();

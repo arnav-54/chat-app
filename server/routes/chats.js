@@ -69,7 +69,6 @@ router.post('/', auth, async (req, res) => {
       }
     });
 
-    // Notify participants
     const io = req.app.get('io');
     const activeUsers = req.app.get('activeUsers');
 

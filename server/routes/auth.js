@@ -8,8 +8,6 @@ const router = express.Router();
 router.post('/register', async (req, res) => {
   try {
     const { username, email, phone, password } = req.body;
-
-    // Check if phone already exists
     if (phone) {
       const existingPhone = await prisma.user.findFirst({ where: { phone } });
       if (existingPhone) return res.status(400).json({ message: 'Phone number already registered' });

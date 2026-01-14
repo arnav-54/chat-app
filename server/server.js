@@ -8,7 +8,10 @@ const prisma = require('./lib/prisma');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
-  cors: { origin: "http://localhost:3000", methods: ["GET", "POST"] }
+  cors: {
+    origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
 });
 
 app.use(cors());
@@ -18,11 +21,25 @@ app.set('io', io);
 const activeUsers = new Map();
 app.set('activeUsers', activeUsers);
 
+// Serve uploads as static
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/chats', require('./routes/chats'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/status', require('./routes/status'));
+
+// Serve static assets in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/build')));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+  });
+}
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);

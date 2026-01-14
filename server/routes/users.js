@@ -36,7 +36,6 @@ router.put('/profile', auth, async (req, res) => {
 
     const updateData = {};
 
-    // Only update fields that are present in the request
     if (username !== undefined) {
       if (username.trim() === '') return res.status(400).json({ message: 'Username cannot be empty' });
       updateData.username = username.trim();
