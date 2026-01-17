@@ -199,7 +199,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
               <div className="chat-details">
                 <div className="chat-top">
                   <div className="chat-name">{chatName}</div>
-                  <div className="chat-time">
+                  <div className="chat-time" style={{ color: unreadCounts[chat._id || chat.id] > 0 ? 'var(--primary-accent)' : 'var(--text-lighter)' }}>
                     {chat.updatedAt ? new Date(chat.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
                   </div>
                 </div>
@@ -208,11 +208,15 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
                     {globalTyping[chat._id || chat.id]?.length > 0 ? (
                       <span style={{ color: 'var(--primary-accent)', fontWeight: '600' }}>typing...</span>
                     ) : (
-                      chat.messages && chat.messages.length > 0 ? chat.messages[0].content : 'Click to start chatting'
+                      <span style={{ color: unreadCounts[chat._id || chat.id] > 0 ? 'var(--text-main)' : 'var(--text-secondary)', fontWeight: unreadCounts[chat._id || chat.id] > 0 ? '600' : '400' }}>
+                        {chat.messages && chat.messages.length > 0 ? (chat.messages[0].type === 'image' ? '📷 Photo' : chat.messages[0].content) : 'Click to start chatting'}
+                      </span>
                     )}
                   </div>
                   {unreadCounts[chat._id || chat.id] > 0 && (
-                    <div className="unread-badge">{unreadCounts[chat._id || chat.id]}</div>
+                    <div className="unread-badge" style={{ boxShadow: '0 0 10px rgba(59, 130, 246, 0.4)' }}>
+                      {unreadCounts[chat._id || chat.id]}
+                    </div>
                   )}
                 </div>
               </div>
