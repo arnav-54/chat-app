@@ -42,7 +42,7 @@ const Register = ({ switchToLogin }) => {
             <input
               id="username"
               type="text"
-              placeholder="e.g. john_doe"
+              placeholder="Enter your username"
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               required
@@ -55,7 +55,7 @@ const Register = ({ switchToLogin }) => {
             <input
               id="email"
               type="email"
-              placeholder="john@example.com"
+              placeholder="Enter your email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
@@ -67,7 +67,7 @@ const Register = ({ switchToLogin }) => {
             <input
               id="phone"
               type="text"
-              placeholder="+1 234 567 890"
+              placeholder="Enter your phone number (optional)"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
             />
@@ -78,7 +78,7 @@ const Register = ({ switchToLogin }) => {
             <input
               id="password"
               type="password"
-              placeholder="Min. 8 characters"
+              placeholder="Enter your password (min. 8 characters)"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required

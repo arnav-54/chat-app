@@ -42,7 +42,7 @@ const Login = ({ switchToRegister }) => {
             <input
               id="identifier"
               type="text"
-              placeholder="name@example.com"
+              placeholder="Enter your email or phone"
               value={formData.identifier}
               onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
               required
@@ -55,7 +55,7 @@ const Login = ({ switchToRegister }) => {
             <input
               id="password"
               type="password"
-              placeholder="••••••••"
+              placeholder="Enter your password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required

@@ -171,8 +171,11 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
           </div>
         ))}
         {typing.length > 0 && (
-          <div style={{ color: 'var(--primary-accent)', fontSize: '13px', fontStyle: 'italic', paddingLeft: '10px', marginBottom: '10px' }}>
-            {typing.map(t => t.username).join(', ')} is typing...
+          <div className="typing-indicator" style={{ marginLeft: '10px' }}>
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+            <div className="typing-dot"></div>
+            <span className="typing-text">{typing.map(t => t.username).join(', ')} is typing</span>
           </div>
         )}
         <div ref={messagesEndRef} />

@@ -19,6 +19,18 @@ const ChatApp = () => {
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const [onlineUsers, setOnlineUsers] = useState([]);
+  const [unreadCounts, setUnreadCounts] = useState({});
+  const [globalTyping, setGlobalTyping] = useState({}); // { chatId: [{id, username}] }
+  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+
+  useEffect(() => {
+    document.body.className = theme === 'light' ? 'light-theme' : '';
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  };
 
   useEffect(() => {
     if (user) {
@@ -47,6 +59,14 @@ const ChatApp = () => {
           if (prev.find(m => m._id === message._id)) return prev;
           return [...prev.filter(m => m._id !== message.tempId), message];
         });
+      } else {
+        // Increment unread count for other chats, only if the message is from someone else
+        if (message.senderId !== user?.id) {
+          setUnreadCounts(prev => ({
+            ...prev,
+            [message.chatId]: (prev[message.chatId] || 0) + 1
+          }));
+        }
       }
 
       setChats(prev => {
@@ -72,14 +92,39 @@ const ChatApp = () => {
       });
     });
 
+    socket.on('userTyping', ({ chatId, userId, username }) => {
+      if (userId !== user?.id) {
+        setGlobalTyping(prev => {
+          const chatTyping = prev[chatId] || [];
+          if (chatTyping.find(u => u.id === userId)) return prev;
+          return {
+            ...prev,
+            [chatId]: [...chatTyping, { id: userId, username }]
+          };
+        });
+      }
+    });
+
+    socket.on('userStoppedTyping', ({ chatId, userId }) => {
+      setGlobalTyping(prev => {
+        const chatTyping = prev[chatId] || [];
+        return {
+          ...prev,
+          [chatId]: chatTyping.filter(u => u.id !== userId)
+        };
+      });
+    });
+
     return () => {
       socket.off('onlineUsers');
       socket.off('userOnline');
       socket.off('userOffline');
       socket.off('newMessage');
       socket.off('newChat');
+      socket.off('userTyping');
+      socket.off('userStoppedTyping');
     };
-  }, [activeChat]);
+  }, [activeChat, user]);
 
   const loadChats = async () => {
     try {
@@ -100,10 +145,18 @@ const ChatApp = () => {
   };
 
   const handleChatSelect = (chat) => {
-    setActiveChat(chat);
     const chatId = chat.id || chat._id;
+    setActiveChat(chat);
     socket.emit('joinChat', chatId);
     loadMessages(chatId);
+
+    // Clear unread count for both id and _id to be safe
+    setUnreadCounts(prev => {
+      const updated = { ...prev };
+      if (chat.id) updated[chat.id] = 0;
+      if (chat._id) updated[chat._id] = 0;
+      return updated;
+    });
   };
 
   const handleLogout = async () => {
@@ -139,6 +192,10 @@ const ChatApp = () => {
         onLogout={handleLogout}
         onNewChat={handleNewChat}
         onlineUsers={onlineUsers}
+        unreadCounts={unreadCounts}
+        globalTyping={globalTyping}
+        theme={theme}
+        toggleTheme={toggleTheme}
       />
 
       <NewChatModal
@@ -155,6 +212,7 @@ const ChatApp = () => {
             setMessages={setMessages}
             onBack={handleBack}
             onlineUsers={onlineUsers}
+            typingUsers={globalTyping[activeChat.id || activeChat._id] || []}
           />
           <AISidebar chat={activeChat} />
         </>
