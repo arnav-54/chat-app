@@ -4,10 +4,6 @@ const auth = require('../middleware/auth');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const router = express.Router();
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-console.log('GEMINI_API_KEY initialized (starts with):', process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 10) : 'undefined');
-
-
 router.get('/', auth, async (req, res) => {
   try {
     const chats = await prisma.chat.findMany({
@@ -105,6 +101,7 @@ router.get('/:id/messages', auth, async (req, res) => {
 
 router.post('/:id/summarize', auth, async (req, res) => {
   try {
+    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
     const messages = await prisma.message.findMany({
       where: { chatId: req.params.id },
       include: { sender: { select: { username: true } } },
@@ -179,7 +176,11 @@ router.post('/:id/summarize', auth, async (req, res) => {
     }
   } catch (error) {
     console.error('Gemini error:', error);
-    res.status(400).json({ message: 'AI processing failed. Please check your API key and model access.' });
+    res.status(400).json({
+      message: 'AI processing failed.',
+      error: error.message,
+      details: error.response?.data || error.response || 'No additional details'
+    });
   }
 });
 
