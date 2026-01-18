@@ -5,6 +5,8 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const router = express.Router();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+console.log('GEMINI_API_KEY initialized (starts with):', process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.substring(0, 10) : 'undefined');
+
 
 router.get('/', auth, async (req, res) => {
   try {
@@ -116,21 +118,68 @@ router.post('/:id/summarize', auth, async (req, res) => {
 
     const conversation = messages.map(m => `${m.sender.username}: ${m.content}`).join('\n');
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-    const prompt = `Summarize this conversation, extract key points, and identify any tasks or decisions made:\n\n${conversation}`;
+    const prompt = `Summarize this conversation, extract key points, and identify any tasks or decisions made. 
+    Format your response as a JSON object with strictly these keys:
+    {
+      "summary": "a concise paragraph summary",
+      "keyPoints": ["point 1", "point 2"],
+      "tasks": ["task 1", "task 2"]
+    }
+    Conversation:
+    \n\n${conversation}`;
 
     const result = await model.generateContent(prompt);
-    const summary = result.response.text();
+    const responseText = result.response.text();
 
-    await prisma.chat.update({
-      where: { id: req.params.id },
-      data: { summary }
-    });
-    res.json({ summary });
+    // Clean up potential markdown formatting from AI response
+    const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
+
+    try {
+      const parsed = JSON.parse(jsonStr);
+
+      // Update chat with summary and key points
+      await prisma.chat.update({
+        where: { id: req.params.id },
+        data: {
+          summary: parsed.summary || responseText,
+          keyPoints: parsed.keyPoints || []
+        }
+      });
+
+      // Handle tasks
+      if (parsed.tasks && Array.isArray(parsed.tasks)) {
+        // Clear old tasks for this chat if needed, or just add new ones
+        // For simplicity, let's just add new ones
+        await Promise.all(
+          parsed.tasks.map(taskText =>
+            prisma.task.create({
+              data: {
+                text: taskText,
+                chatId: req.params.id
+              }
+            })
+          )
+        );
+      }
+
+      res.json({
+        summary: parsed.summary || responseText,
+        tasks: parsed.tasks || []
+      });
+    } catch (parseError) {
+      console.error('Failed to parse AI response as JSON:', responseText);
+      // Fallback for non-JSON response
+      await prisma.chat.update({
+        where: { id: req.params.id },
+        data: { summary: responseText }
+      });
+      res.json({ summary: responseText });
+    }
   } catch (error) {
     console.error('Gemini error:', error);
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: 'AI processing failed. Please check your API key and model access.' });
   }
 });
 

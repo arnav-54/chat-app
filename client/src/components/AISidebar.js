@@ -4,12 +4,16 @@ import api from '../services/api';
 const AISidebar = ({ chat }) => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(chat.summary || '');
+  const [tasks, setTasks] = useState(chat.tasks || []);
 
   const handleSummarize = async () => {
     setLoading(true);
     try {
       const response = await api.post(`/chats/${chat.id || chat._id}/summarize`);
       setSummary(response.data.summary);
+      if (response.data.tasks) {
+        setTasks(response.data.tasks.map(t => typeof t === 'string' ? { text: t } : t));
+      }
     } catch (error) {
       console.error('Summarization failed:', error);
     } finally {
@@ -48,9 +52,9 @@ const AISidebar = ({ chat }) => {
             Action Items
           </h4>
           <div className="ai-summary-text">
-            {chat.tasks?.length > 0 ? (
+            {tasks?.length > 0 ? (
               <ul style={{ paddingLeft: '20px', margin: 0 }}>
-                {chat.tasks.map((task, index) => (
+                {tasks.map((task, index) => (
                   <li key={index} style={{ marginBottom: '8px' }}>{task.text}</li>
                 ))}
               </ul>
