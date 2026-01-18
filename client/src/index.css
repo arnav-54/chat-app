@@ -899,3 +899,87 @@ body {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+  .ai-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .main-chat,
+  .empty-state-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 50;
+    display: none;
+  }
+
+  .active-chat-open .main-chat {
+    display: flex;
+  }
+
+  .active-chat-open .sidebar {
+    display: none;
+  }
+
+  .messages-container {
+    padding: 15px 15px;
+  }
+
+  .message {
+    max-width: 85%;
+  }
+
+  .auth-card-container {
+    padding: 35px 25px;
+    border-radius: 24px;
+    margin: 15px;
+  }
+
+  .auth-form h1 {
+    font-size: 28px;
+  }
+
+  .chat-header {
+    padding: 0 15px;
+  }
+
+  .message-input-container {
+    padding: 12px 15px;
+    gap: 10px;
+  }
+
+  .btn-icon-chat {
+    padding: 8px;
+  }
+
+  .input-wrapper {
+    padding: 0 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar-large {
+    width: 120px;
+    height: 120px;
+  }
+
+  .chat-name {
+    font-size: 16px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+}

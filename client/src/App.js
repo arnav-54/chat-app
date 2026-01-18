@@ -184,7 +184,7 @@ const ChatApp = () => {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${activeChat ? 'active-chat-open' : ''}`}>
       <ChatList
         chats={chats}
         activeChat={activeChat}
