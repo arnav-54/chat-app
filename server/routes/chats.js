@@ -1,10 +1,10 @@
 const express = require('express');
 const prisma = require('../lib/prisma');
 const auth = require('../middleware/auth');
-const OpenAI = require('openai');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const router = express.Router();
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 router.get('/', auth, async (req, res) => {
   try {
@@ -110,21 +110,18 @@ router.post('/:id/summarize', auth, async (req, res) => {
       take: 100
     });
 
+    if (messages.length === 0) {
+      return res.json({ summary: "No messages to summarize." });
+    }
+
     const conversation = messages.map(m => `${m.sender.username}: ${m.content}`).join('\n');
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [{
-        role: "system",
-        content: "Summarize this conversation, extract key points, and identify any tasks or decisions made."
-      }, {
-        role: "user",
-        content: conversation
-      }],
-      max_tokens: 500
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const summary = completion.choices[0].message.content;
+    const prompt = `Summarize this conversation, extract key points, and identify any tasks or decisions made:\n\n${conversation}`;
+
+    const result = await model.generateContent(prompt);
+    const summary = result.response.text();
 
     await prisma.chat.update({
       where: { id: req.params.id },
@@ -132,6 +129,7 @@ router.post('/:id/summarize', auth, async (req, res) => {
     });
     res.json({ summary });
   } catch (error) {
+    console.error('Gemini error:', error);
     res.status(400).json({ message: error.message });
   }
 });
