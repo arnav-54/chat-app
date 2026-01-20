@@ -584,9 +584,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  padding: 40px 20px;
   position: relative;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* Background blob effects for that premium feel */
@@ -618,13 +618,14 @@ body {
   z-index: 10;
   width: 100%;
   max-width: 440px;
-  padding: 50px 40px;
+  padding: 40px 35px;
   background: rgba(15, 23, 42, 0.7);
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 32px;
   box-shadow: 0 40px 80px -15px rgba(0, 0, 0, 0.5);
   transition: var(--transition-smooth);
+  margin: auto;
 }
 
 .light-theme .auth-card-container {
@@ -638,8 +639,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 15px;
-  margin-bottom: 40px;
+  gap: 12px;
+  margin-bottom: 30px;
 }
 
 .auth-logo span {
@@ -653,23 +654,23 @@ body {
 }
 
 .auth-form h1 {
-  font-size: 34px;
+  font-size: 28px;
   color: var(--text-main);
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   font-weight: 800;
   text-align: center;
 }
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 16px;
-  margin-bottom: 40px;
+  font-size: 15px;
+  margin-bottom: 30px;
   text-align: center;
   line-height: 1.5;
 }
 
 .form-group {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .form-group label {
