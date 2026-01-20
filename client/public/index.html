@@ -9,10 +9,39 @@
   <title>EchoChat - Smart Messaging</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background-color: #00a884; }
+    body { background-color: #020617; }
+    
+    .pre-loader {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+      color: #3b82f6;
+      font-family: 'Inter', sans-serif;
+      gap: 20px;
+    }
+
+    .pre-loader-icon {
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+    }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <div class="pre-loader">
+      <svg class="pre-loader-icon" viewBox="0 0 24 24" width="60" height="60" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <div style="font-weight: 800; letter-spacing: 4px; font-size: 24px;">ECHOCHAT</div>
+    </div>
+  </div>
 </body>
 </html>

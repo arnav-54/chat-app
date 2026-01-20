@@ -11,14 +11,23 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedToken = sessionStorage.getItem('token');
-    const userData = sessionStorage.getItem('user');
-    if (savedToken && userData) {
-      setToken(savedToken);
-      setUser(JSON.parse(userData));
-      api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
-    }
-    setLoading(false);
+    const checkAuth = async () => {
+      const savedToken = sessionStorage.getItem('token');
+      const userData = sessionStorage.getItem('user');
+
+      if (savedToken && userData) {
+        setToken(savedToken);
+        setUser(JSON.parse(userData));
+        api.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`;
+      }
+
+      // Ensure splash screen shows for at least 1.5 seconds for a premium feel
+      setTimeout(() => {
+        setLoading(false);
+      }, 1500);
+    };
+
+    checkAuth();
   }, []);
 
   const login = (newToken, userData) => {

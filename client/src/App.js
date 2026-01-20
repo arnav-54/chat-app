@@ -9,6 +9,7 @@ import NewChatModal from './components/NewChatModal';
 import SettingsModal from './components/SettingsModal';
 import socket from './services/socket';
 import api from './services/api';
+import SplashScreen from './components/SplashScreen';
 
 const ChatApp = () => {
   const { user, logout } = useAuth();
@@ -247,7 +248,7 @@ const AuthWrapper = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   if (loading) {
-    return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>Loading...</div>;
+    return <SplashScreen />;
   }
 
   if (!user) {
