@@ -92,7 +92,7 @@ const NewChatModal = ({ isOpen, onClose, onChatCreated }) => {
           {!isGroupCreation && (
             <button
               className="btn-primary"
-              style={{ marginBottom: '20px', background: '#f8f9fa', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '12px', width: '100%', justifyContent: 'flex-start', border: '1px solid var(--border-default)', boxShadow: 'none' }}
+              style={{ marginBottom: '20px', background: 'var(--bg-input)', color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '12px', width: '100%', justifyContent: 'flex-start', border: '1px solid var(--border-default)', boxShadow: 'none' }}
               onClick={() => setIsGroupCreation(true)}
             >
               <div className="avatar" style={{ width: '35px', height: '35px', background: 'var(--primary)' }}>
