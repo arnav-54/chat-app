@@ -9,12 +9,16 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' ? false : "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  credentials: true
+}));
 app.use(express.json());
 app.set('io', io);
 
@@ -33,13 +37,19 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/status', require('./routes/status'));
 
 // Serve static assets in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/build')));
+// API-only mode for separate deployment
+app.get('/', (req, res) => {
+  res.send('API is running successfully. Please use the frontend URL to access the application.');
+});
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
-  });
-}
+// Serve static assets in production - DISABLED for separate deployment
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname, '../client/build')));
+// 
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.resolve(__dirname, '../client', 'build', 'index.html'));
+//   });
+// }
 
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
