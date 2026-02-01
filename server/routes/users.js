@@ -7,7 +7,17 @@ router.get('/search', auth, async (req, res) => {
   try {
     const searchTerm = req.query.q?.trim();
     console.log('Searching for users with query:', searchTerm);
-    if (!searchTerm) return res.json([]);
+    if (!searchTerm) {
+      // If no search term, return recent 20 users (recommendations)
+      const users = await prisma.user.findMany({
+        where: {
+          NOT: { id: req.user.id }
+        },
+        take: 20,
+        select: { id: true, username: true, email: true, phone: true, avatar: true, isOnline: true, status: true }
+      });
+      return res.json(users);
+    }
 
     const users = await prisma.user.findMany({
       where: {

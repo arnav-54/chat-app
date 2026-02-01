@@ -23,6 +23,7 @@ const ChatApp = () => {
   const [unreadCounts, setUnreadCounts] = useState({});
   const [globalTyping, setGlobalTyping] = useState({}); // { chatId: [{id, username}] }
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
+  const [showAISidebar, setShowAISidebar] = useState(false);
 
   useEffect(() => {
     document.body.className = theme === 'light' ? 'light-theme' : '';
@@ -87,7 +88,11 @@ const ChatApp = () => {
 
     socket.on('newChat', (chat) => {
       setChats(prev => {
-        if (prev.find(c => (c.id || c._id) === (chat.id || chat._id))) return prev;
+        const existing = prev.find(c => (c.id || c._id) === (chat.id || chat._id));
+        if (existing) return prev;
+
+        // Ensure we don't duplicate by logic (double event fire)
+        // Also check if we just created it manually in handleChatCreated
         socket.emit('joinChat', chat.id || chat._id);
         return [chat, ...prev];
       });
@@ -131,6 +136,10 @@ const ChatApp = () => {
     try {
       const response = await api.get('/chats');
       setChats(response.data);
+      // Join all chat rooms to receive real-time updates
+      response.data.forEach(chat => {
+        socket.emit('joinChat', chat.id || chat._id);
+      });
     } catch (error) {
       console.error('Failed to load chats:', error);
     }
@@ -179,9 +188,17 @@ const ChatApp = () => {
   };
 
   const handleChatCreated = (newChat) => {
-    setChats(prev => [newChat, ...prev]);
+    setChats(prev => {
+      if (prev.find(c => (c.id || c._id) === (newChat.id || newChat._id))) return prev;
+      return [newChat, ...prev];
+    });
     setActiveChat(newChat);
     setMessages([]);
+  };
+
+  const handleChatDeleted = (chatId) => {
+    setChats(prev => prev.filter(c => (c.id || c._id) !== chatId));
+    setActiveChat(null);
   };
 
   return (
@@ -214,8 +231,14 @@ const ChatApp = () => {
             onBack={handleBack}
             onlineUsers={onlineUsers}
             typingUsers={globalTyping[activeChat.id || activeChat._id] || []}
+            onChatDeleted={handleChatDeleted}
+            onToggleAI={() => setShowAISidebar(!showAISidebar)}
           />
-          <AISidebar chat={activeChat} />
+          <AISidebar
+            chat={activeChat}
+            isOpen={showAISidebar}
+            onClose={() => setShowAISidebar(false)}
+          />
         </>
       ) : (
         <div className="empty-state-container">

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import api from '../services/api';
 
-const AISidebar = ({ chat }) => {
+const AISidebar = ({ chat, isOpen, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [summary, setSummary] = useState(chat.summary || '');
   const [tasks, setTasks] = useState(chat.tasks || []);
@@ -16,16 +16,22 @@ const AISidebar = ({ chat }) => {
       }
     } catch (error) {
       console.error('Summarization failed:', error);
+      const msg = error.response?.data?.message || error.message || 'Failed to generate summary.';
+      const friendlyMsg = msg.includes('404') ? 'Model not found for this API key. Trying a standard model...' : msg;
+      setSummary(`Error: ${friendlyMsg}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="ai-sidebar">
+    <div className={`ai-sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <div className="ai-sidebar-header">
         <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--primary-accent)"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"></path></svg>
-        <span style={{ fontSize: '18px', fontWeight: '700', marginLeft: '12px' }}>AI Insights</span>
+        <span style={{ fontSize: '18px', fontWeight: '700', marginLeft: '12px', flex: 1 }}>AI Insights</span>
+        <button onClick={onClose} className="btn-icon mobile-only" style={{ padding: '5px' }}>
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"></path></svg>
+        </button>
       </div>
 
       <div className="ai-content">

@@ -22,7 +22,21 @@ router.post('/register', async (req, res) => {
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
     res.status(201).json({ token, user: { id: user.id, username, email, phone, avatar: user.avatar, status: user.status } });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    if (error.code === 'P2002') {
+      const target = error.meta?.target || [];
+      if (target.includes('username')) {
+        return res.status(400).json({ message: 'Username is already taken. Please choose another one.' });
+      }
+      if (target.includes('email')) {
+        return res.status(400).json({ message: 'Email is already registered. Please login instead.' });
+      }
+      if (target.includes('phone')) {
+        return res.status(400).json({ message: 'Phone number is already registered.' });
+      }
+      return res.status(400).json({ message: 'User with these details already exists.' });
+    }
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Something went wrong during registration. Please try again.' });
   }
 });
 

@@ -791,6 +791,11 @@ body {
   background: var(--bg-sidebar-header);
 }
 
+.ai-content {
+  margin-top: 20px;
+  /* Added margin to move content down */
+}
+
 .ai-card {
   margin: 15px;
   padding: 20px;
@@ -902,9 +907,40 @@ body {
 }
 
 /* Mobile Responsiveness */
+.mobile-only {
+  display: none;
+}
+
+.ai-toggle-btn {
+  display: none;
+}
+
 @media (max-width: 900px) {
+  .mobile-only {
+    display: flex;
+  }
+
+  .ai-toggle-btn {
+    display: flex;
+  }
+
   .ai-sidebar {
-    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 320px;
+    /* Or 85% for very small screens */
+    z-index: 200;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    display: flex;
+    /* Ensure it is flex, not none */
+  }
+
+  .ai-sidebar.mobile-open {
+    transform: translateX(0);
   }
 }
 

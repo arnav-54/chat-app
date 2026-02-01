@@ -4,11 +4,12 @@ import { useAuth } from '../context/AuthContext';
 import socket from '../services/socket';
 import api from '../services/api';
 
-const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
+const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDeleted, onToggleAI }) => {
   const [newMessage, setNewMessage] = useState('');
   const [typing, setTyping] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -141,6 +142,55 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers }) => {
               : (isOnline() ? <span style={{ color: 'var(--primary-accent)', fontWeight: '600' }}>online</span> : 'last seen recently')}
           </div>
         </div>
+
+        <button
+          className="btn-icon ai-toggle-btn"
+          onClick={onToggleAI}
+          title="AI Insights"
+          style={{ marginLeft: '10px' }}
+        >
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--primary-accent)">
+            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 12h-2v-2h2v2zm0-4h-2V7h2v4z"></path>
+          </svg>
+        </button>
+
+        {isDeleting ? (
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '10px' }}>
+            <button
+              className="btn-primary"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  await api.delete(`/chats/${chat.id || chat._id}`);
+                  if (onChatDeleted) onChatDeleted(chat.id || chat._id);
+                } catch (error) {
+                  console.error('Failed to delete chat', error);
+                  alert('Failed to delete chat');
+                  setIsDeleting(false);
+                }
+              }}
+              style={{ background: 'var(--danger)', padding: '5px 15px', fontSize: '13px', height: 'auto' }}
+            >
+              Confirm Delete
+            </button>
+            <button
+              className="btn-icon"
+              onClick={(e) => { e.stopPropagation(); setIsDeleting(false); }}
+              style={{ border: '1px solid var(--border-default)' }}
+            >
+              Cancel
+            </button>
+          </div>
+        ) : (
+          <button
+            className="btn-icon"
+            onClick={(e) => { e.stopPropagation(); setIsDeleting(true); }}
+            title="Delete Chat"
+            style={{ marginLeft: 'auto', color: 'var(--danger)' }}
+          >
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+          </button>
+        )}
       </div>
 
       <div className="messages-container" onClick={() => setShowEmojiPicker(false)}>

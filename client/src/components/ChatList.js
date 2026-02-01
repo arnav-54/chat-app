@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import StatusModal from './StatusModal';
+import StatusViewerModal from './StatusViewerModal';
 
 const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, onlineUsers, unreadCounts, globalTyping, theme, toggleTheme }) => {
   const { user, token, login } = useAuth();
@@ -13,6 +14,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
   const [statusText, setStatusText] = useState(user?.status || '');
   const [loading, setLoading] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
+  const [viewingStatus, setViewingStatus] = useState(null);
   const avatarInputRef = useRef(null);
 
   useEffect(() => {
@@ -95,7 +97,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
           <div className="profile-info-card">
             <div className="profile-label">Your Name</div>
             <div className="profile-value">
-              <input value={username} onChange={e => setUsername(e.target.value)} onBlur={handleUpdateProfile} />
+              <input value={username} onChange={e => setUsername(e.target.value)} />
             </div>
             <p style={{ marginTop: '15px', fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }}>
               This name will be visible to your contacts and inside group chats.
@@ -105,8 +107,19 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
           <div className="profile-info-card">
             <div className="profile-label">About / Status</div>
             <div className="profile-value">
-              <input value={statusText} onChange={e => setStatusText(e.target.value)} onBlur={handleUpdateProfile} />
+              <input value={statusText} onChange={e => setStatusText(e.target.value)} />
             </div>
+          </div>
+
+          <div style={{ padding: '0 30px' }}>
+            <button
+              className="btn-primary"
+              onClick={handleUpdateProfile}
+              disabled={loading}
+              style={{ marginTop: '10px' }}
+            >
+              {loading ? 'Saving...' : 'Save Profile'}
+            </button>
           </div>
         </div>
       </div>
@@ -120,19 +133,33 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
           <h3>Updates</h3>
         </div>
         <div className="panel-content">
-          <div className="status-item" onClick={() => setShowStatusModal(true)} style={{ marginBottom: '10px' }}>
-            <div className="status-circle">
-              {user?.avatar ? <img src={user.avatar} alt="Me" /> : user?.username?.[0]?.toUpperCase()}
+          <div className="status-item" onClick={() => myStatuses.length > 0 ? setViewingStatus({ user, updates: myStatuses }) : setShowStatusModal(true)} style={{ marginBottom: '10px', position: 'relative' }}>
+            <div className="status-circle" style={{ border: myStatuses.length > 0 ? '2px solid var(--primary-accent)' : 'none', padding: myStatuses.length > 0 ? '2px' : '0' }}>
+              {user?.avatar ? <img src={user.avatar} alt="Me" style={{ borderRadius: '50%' }} /> : user?.username?.[0]?.toUpperCase()}
             </div>
             <div className="chat-info">
               <div className="chat-name">My Status</div>
-              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Click to share an update</p>
+              <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+                {myStatuses.length > 0
+                  ? new Date(myStatuses[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                  : 'Click to share an update'}
+              </p>
             </div>
+            {myStatuses.length > 0 && (
+              <button
+                className="btn-icon"
+                onClick={(e) => { e.stopPropagation(); setShowStatusModal(true); }}
+                style={{ position: 'absolute', right: '10px', background: 'var(--bg-secondary)', borderRadius: '50%', width: '32px', height: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                title="Add new status"
+              >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="var(--primary-accent)"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"></path></svg>
+              </button>
+            )}
           </div>
 
           <div className="status-section-title">RECENT UPDATES</div>
           {statuses.length > 0 ? statuses.map(group => (
-            <div key={group.user.id} className="status-item" onClick={() => alert(group.updates[0].content)}>
+            <div key={group.user.id} className="status-item" onClick={() => setViewingStatus(group)}>
               <div className="status-circle">
                 <img src={group.user.avatar || 'https://via.placeholder.com/150'} alt="avatar" />
               </div>
@@ -226,6 +253,7 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
       </div>
 
       <StatusModal isOpen={showStatusModal} onClose={() => setShowStatusModal(false)} onStatusPosted={() => { fetchStatuses(); setShowStatusModal(false); }} />
+      <StatusViewerModal isOpen={!!viewingStatus} onClose={() => setViewingStatus(null)} statusGroup={viewingStatus} />
     </div>
   );
 };
