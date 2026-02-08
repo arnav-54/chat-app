@@ -51,7 +51,7 @@ router.put('/profile', auth, async (req, res) => {
       updateData.username = username.trim();
     }
 
-    if (avatar !== undefined) updateData.avatar = avatar;
+    if (avatar !== undefined) updateData.avatar = avatar === null ? '' : avatar;
     if (status !== undefined) updateData.status = status;
 
     if (phone !== undefined) {

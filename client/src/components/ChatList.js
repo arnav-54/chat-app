@@ -16,6 +16,11 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [viewingStatus, setViewingStatus] = useState(null);
   const avatarInputRef = useRef(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  useEffect(() => {
+    setShowDeleteConfirm(false);
+  }, [activePanel]);
 
   useEffect(() => {
     if (activePanel === 'status') {
@@ -77,11 +82,11 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
 
   const handleRemoveAvatar = async (e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to remove your profile photo?')) return;
+    setShowDeleteConfirm(false);
 
     setLoading(true);
     try {
-      const res = await api.put('/users/profile', { avatar: null });
+      const res = await api.put('/users/profile', { avatar: '' });
       login(token, res.data);
     } catch (err) {
       console.error(err);
@@ -108,30 +113,85 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
                 {loading && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>...</div>}
               </div>
               {user?.avatar && (
-                <button
-                  className="btn-icon"
-                  onClick={handleRemoveAvatar}
-                  title="Remove Profile Photo"
-                  style={{
-                    position: 'absolute',
-                    bottom: '5px',
-                    right: '5px',
-                    background: 'var(--danger)',
-                    borderRadius: '50%',
-                    width: '36px',
-                    height: '36px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    border: '3px solid var(--bg-sidebar)',
-                    color: 'white',
-                    zIndex: 10,
-                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-                    cursor: 'pointer'
-                  }}
-                >
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
-                </button>
+                <>
+                  <button
+                    className="btn-icon"
+                    onClick={(e) => { e.stopPropagation(); setShowDeleteConfirm(true); }}
+                    title="Remove Profile Photo"
+                    style={{
+                      position: 'absolute',
+                      bottom: '5px',
+                      right: '5px',
+                      background: 'var(--danger)',
+                      borderRadius: '50%',
+                      width: '36px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: '3px solid var(--bg-sidebar)',
+                      color: 'white',
+                      zIndex: 10,
+                      boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                  </button>
+                  {showDeleteConfirm && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '-50px',
+                      right: '-10px',
+                      zIndex: 20,
+                      background: 'var(--bg-sidebar)',
+                      padding: '12px',
+                      boxShadow: '0 5px 20px rgba(0,0,0,0.4)',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-default)',
+                      minWidth: '160px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px',
+                      animation: 'fadeIn 0.2s ease-out'
+                    }} onClick={e => e.stopPropagation()}>
+                      <div style={{ fontSize: '13px', color: 'var(--text-main)', fontWeight: '600' }}>Remove photo?</div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          style={{
+                            flex: 1,
+                            background: 'var(--danger)',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '6px',
+                            padding: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer',
+                            fontWeight: '600'
+                          }}
+                          onClick={handleRemoveAvatar}
+                        >
+                          Yes
+                        </button>
+                        <button
+                          style={{
+                            flex: 1,
+                            background: 'transparent',
+                            color: 'var(--text-secondary)',
+                            border: '1px solid var(--border-default)',
+                            borderRadius: '6px',
+                            padding: '6px',
+                            fontSize: '12px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setShowDeleteConfirm(false)}
+                        >
+                          No
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
             <input type="file" ref={avatarInputRef} style={{ display: 'none' }} onChange={handleAvatarUpload} accept="image/*" />
