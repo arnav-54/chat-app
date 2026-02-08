@@ -75,6 +75,21 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
     getChatName(chat).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleRemoveAvatar = async (e) => {
+    e.stopPropagation();
+    if (!window.confirm('Are you sure you want to remove your profile photo?')) return;
+
+    setLoading(true);
+    try {
+      const res = await api.put('/users/profile', { avatar: null });
+      login(token, res.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="sidebar">
       {/* Profile Panel */}
@@ -87,9 +102,37 @@ const ChatList = ({ chats, activeChat, onChatSelect, onLogout, onNewChat, online
         </div>
         <div className="panel-content">
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '30px 0' }}>
-            <div className="avatar avatar-large" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => avatarInputRef.current.click()}>
-              {user?.avatar ? <img src={user.avatar} alt="Profile" /> : user?.username?.[0]?.toUpperCase()}
-              {loading && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>...</div>}
+            <div style={{ position: 'relative' }}>
+              <div className="avatar avatar-large" style={{ cursor: 'pointer', position: 'relative' }} onClick={() => avatarInputRef.current.click()}>
+                {user?.avatar ? <img src={user.avatar} alt="Profile" /> : user?.username?.[0]?.toUpperCase()}
+                {loading && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%' }}>...</div>}
+              </div>
+              {user?.avatar && (
+                <button
+                  className="btn-icon"
+                  onClick={handleRemoveAvatar}
+                  title="Remove Profile Photo"
+                  style={{
+                    position: 'absolute',
+                    bottom: '5px',
+                    right: '5px',
+                    background: 'var(--danger)',
+                    borderRadius: '50%',
+                    width: '36px',
+                    height: '36px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    border: '3px solid var(--bg-sidebar)',
+                    color: 'white',
+                    zIndex: 10,
+                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"></path></svg>
+                </button>
+              )}
             </div>
             <input type="file" ref={avatarInputRef} style={{ display: 'none' }} onChange={handleAvatarUpload} accept="image/*" />
           </div>
