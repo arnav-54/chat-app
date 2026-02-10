@@ -378,7 +378,7 @@ body {
 
 .messages-container {
   flex: 1;
-  padding: 20px 5%;
+  padding: 20px 20px;
   overflow-y: auto;
   background-color: var(--bg-app);
   background-image:
@@ -391,7 +391,7 @@ body {
 
 /* Premium Bubble Design */
 .message {
-  max-width: 70%;
+  max-width: 75%;
   margin-bottom: 4px;
   padding: 10px 16px;
   border-radius: 20px;
