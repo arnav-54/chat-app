@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
         data: { updatedAt: new Date() }
       });
 
-      io.to(data.chatId).emit('newMessage', message);
+      io.to(data.chatId).emit('newMessage', { ...message, tempId: data.tempId });
     } catch (error) {
       console.error('Message error:', error);
       socket.emit('error', error.message);

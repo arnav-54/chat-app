@@ -43,6 +43,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
     if (e) e.preventDefault();
     if (!content.trim() && !fileData) return;
 
+    const tempId = Date.now().toString();
     const messageData = {
       senderId: user.id,
       chatId: chat.id || chat._id,
@@ -50,10 +51,10 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
       type: type,
       fileUrl: fileData?.url,
       fileName: fileData?.name,
-      replyToId: replyingTo?.id || replyingTo?._id
+      replyToId: replyingTo?.id || replyingTo?._id,
+      tempId: tempId // Send tempId to server
     };
 
-    const tempId = Date.now().toString();
     const tempMessage = {
       _id: tempId,
       content: content,
@@ -72,7 +73,64 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
     handleStopTyping();
   };
 
-  // ... (keep handleFileUpload, handleTyping, handleStopTyping, etc.)
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api.post('/upload', formData);
+      let type = 'file';
+      if (file.type.startsWith('image/')) type = 'image';
+      else if (file.type.startsWith('video/')) type = 'video';
+
+      handleSendMessage(null, file.name, type, { url: response.data.url, name: file.name });
+    } catch (error) {
+      console.error('Upload failed:', error);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleTyping = (e) => {
+    setNewMessage(e.target.value);
+    if (!isTyping) {
+      setIsTyping(true);
+      socket.emit('typing', { chatId: chat.id || chat._id, userId: user.id, username: user.username });
+    }
+    clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      handleStopTyping();
+    }, 2000);
+  };
+
+  const handleStopTyping = () => {
+    if (isTyping) {
+      setIsTyping(false);
+      socket.emit('stopTyping', { chatId: chat.id || chat._id, userId: user.id });
+    }
+  };
+
+  const getOtherUser = () => {
+    if (chat.isGroup) return null;
+    const otherParticipant = chat.participants?.find(p => (p.user?.id || p.user?._id) !== user.id);
+    return otherParticipant?.user;
+  };
+
+  const getChatName = () => {
+    if (chat.isGroup) return chat.name;
+    return getOtherUser()?.username || 'Unknown User';
+  };
+
+  const isOnline = () => {
+    if (chat.isGroup) return false;
+    const otherUser = getOtherUser();
+    if (!otherUser) return false;
+    return onlineUsers.includes(otherUser.id) || onlineUsers.includes(otherUser._id);
+  };
 
   return (
     <div className="main-chat">
