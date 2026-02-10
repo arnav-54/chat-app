@@ -118,6 +118,7 @@ router.get('/:id/messages', auth, async (req, res) => {
       where: { chatId: req.params.id },
       include: {
         sender: { select: { id: true, username: true, avatar: true } },
+        replyTo: { select: { id: true, content: true, type: true, fileUrl: true, sender: { select: { username: true } } } },
         reactions: { include: { user: { select: { id: true, username: true } } } }
       },
       orderBy: { createdAt: 'asc' }

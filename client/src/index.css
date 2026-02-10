@@ -428,7 +428,45 @@ body {
   margin-top: 6px;
   opacity: 0.7;
   display: block;
-  text-align: right;
+}
+
+.reply-action {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 8px;
+  background: var(--bg-sidebar);
+  border-radius: 50%;
+  opacity: 0;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  box-shadow: var(--shadow-main);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.message:hover .reply-action {
+  opacity: 1;
+}
+
+.reply-action.own {
+  left: -40px;
+}
+
+.reply-action.other {
+  right: -40px;
+}
+
+.reply-action:hover {
+  background: var(--primary-accent);
+  color: white;
+  transform: translateY(-50%) scale(1.1);
+}
+
+text-align: right;
 }
 
 /* Typing Indicator Animation */

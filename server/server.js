@@ -75,10 +75,12 @@ io.on('connection', (socket) => {
           fileUrl: data.fileUrl,
           fileName: data.fileName,
           senderId: data.senderId,
-          chatId: data.chatId
+          chatId: data.chatId,
+          replyToId: data.replyToId
         },
         include: {
           sender: { select: { id: true, username: true, avatar: true } },
+          replyTo: { select: { id: true, content: true, type: true, fileUrl: true, sender: { select: { username: true } } } },
           reactions: { include: { user: { select: { id: true, username: true } } } }
         }
       });

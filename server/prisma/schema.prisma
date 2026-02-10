@@ -81,6 +81,10 @@ model Message {
   chat        Chat          @relation(fields: [chatId], references: [id])
   chatId      String        @db.ObjectId
   reactions   Reaction[]
+
+  replyToId   String?       @db.ObjectId
+  replyTo     Message?      @relation("ReplyTo", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies     Message[]     @relation("ReplyTo")
 }
 
 model Reaction {
