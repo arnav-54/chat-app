@@ -6,7 +6,7 @@ import ChatList from './components/ChatList';
 import ChatWindow from './components/ChatWindow';
 import AISidebar from './components/AISidebar';
 import NewChatModal from './components/NewChatModal';
-import SettingsModal from './components/SettingsModal';
+
 import socket from './services/socket';
 import api from './services/api';
 import SplashScreen from './components/SplashScreen';
@@ -17,7 +17,7 @@ const ChatApp = () => {
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
+
 
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [unreadCounts, setUnreadCounts] = useState({});
