@@ -428,6 +428,7 @@ body {
   margin-top: 6px;
   opacity: 0.7;
   display: block;
+  text-align: right;
 }
 
 .reply-action {
@@ -464,9 +465,6 @@ body {
   background: var(--primary-accent);
   color: white;
   transform: translateY(-50%) scale(1.1);
-}
-
-text-align: right;
 }
 
 /* Typing Indicator Animation */

@@ -236,6 +236,7 @@ const ChatApp = () => {
           />
           <AISidebar
             chat={activeChat}
+            messages={messages}
             isOpen={showAISidebar}
             onClose={() => setShowAISidebar(false)}
           />
