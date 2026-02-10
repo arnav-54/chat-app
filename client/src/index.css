@@ -89,9 +89,9 @@ body {
 
 /* Sidebar Styling - Professional Stealth */
 .sidebar {
-  width: 30%;
-  min-width: 350px;
-  max-width: 480px;
+  width: 25%;
+  min-width: 260px;
+  max-width: 360px;
   background: var(--bg-sidebar);
   border-right: 1px solid var(--border-default);
   display: flex;
