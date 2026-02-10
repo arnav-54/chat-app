@@ -14,7 +14,6 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
     const statuses = statusGroup.updates || [];
     const currentStatus = statuses[currentIndex];
 
-    // Safety check
     if (!currentStatus) return null;
 
     const handleNext = (e) => {
@@ -53,7 +52,7 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                 display: 'flex',
                 flexDirection: 'column'
             }}>
-                {/* Progress Bars */}
+
                 <div style={{
                     position: 'absolute',
                     top: '10px',
@@ -74,7 +73,7 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                     ))}
                 </div>
 
-                {/* Header (User Info) */}
+
                 <div style={{
                     position: 'absolute',
                     top: '20px',
@@ -98,7 +97,6 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                     </div>
                 </div>
 
-                {/* Close Button */}
                 <button className="btn-icon" onClick={onClose} style={{
                     position: 'absolute',
                     top: '20px',
@@ -109,7 +107,7 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                     <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
                 </button>
 
-                {/* Content */}
+
                 <div style={{
                     flex: 1,
                     display: 'flex',
@@ -118,7 +116,7 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                     background: '#000',
                     position: 'relative'
                 }}>
-                    {/* Navigation Click Areas using transparent divs */}
+
                     <div style={{ position: 'absolute', left: 0, top: 0, width: '30%', height: '100%', zIndex: 5 }} onClick={handlePrev}></div>
                     <div style={{ position: 'absolute', right: 0, top: 0, width: '30%', height: '100%', zIndex: 5 }} onClick={handleNext}></div>
 
@@ -151,7 +149,7 @@ const StatusViewerModal = ({ isOpen, onClose, statusGroup }) => {
                     )}
                 </div>
 
-                {/* Caption if media has content text */}
+
                 {currentStatus.mediaUrl && currentStatus.content && (
                     <div style={{
                         position: 'absolute',

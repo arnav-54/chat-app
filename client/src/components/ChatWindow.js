@@ -52,7 +52,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
       fileUrl: fileData?.url,
       fileName: fileData?.name,
       replyToId: replyingTo?.id || replyingTo?._id,
-      tempId: tempId // Send tempId to server
+      tempId: tempId
     };
 
     const tempMessage = {
@@ -134,7 +134,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
 
   return (
     <div className="main-chat">
-      {/* ... (keep chat-header) */}
+
       <div className="chat-header">
         <button className="btn-icon" onClick={onBack} style={{ marginRight: '15px' }}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg>
@@ -209,7 +209,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
             className={`message ${message.sender?.id === user.id ? 'own' : 'other'}`}
             onDoubleClick={() => setReplyingTo(message)} // Simple double-click to reply
           >
-            {/* Display Quoted Message */}
+
             {message.replyTo && (
               <div style={{
                 background: 'rgba(0,0,0,0.1)',
@@ -246,7 +246,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
               )}
             </div>
 
-            {/* Reply Action (Desktop Hover) */}
+
             <div className={`reply-action ${message.sender?.id === user.id ? 'own' : 'other'}`}
               onClick={(e) => { e.stopPropagation(); setReplyingTo(message); }}
               title="Reply"
@@ -271,7 +271,7 @@ const ChatWindow = ({ chat, messages, setMessages, onBack, onlineUsers, onChatDe
       </div>
 
       <form className="message-input-container" onSubmit={handleSendMessage} style={{ flexDirection: 'column', alignItems: 'stretch' }}>
-        {/* Reply Preview */}
+
         {replyingTo && (
           <div style={{
             display: 'flex',

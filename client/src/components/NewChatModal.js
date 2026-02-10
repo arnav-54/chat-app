@@ -12,8 +12,7 @@ const NewChatModal = ({ isOpen, onClose, onChatCreated }) => {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    // Allow empty query to fetch default users (recommendations)
-    // if (!query.trim()) { ... } - REMOVED check to allow default users search
+
 
     setLoading(true);
     if (searchTimeoutRef.current) {
@@ -76,11 +75,9 @@ const NewChatModal = ({ isOpen, onClose, onChatCreated }) => {
   useEffect(() => {
     if (isOpen) {
       if (!isGroupCreation) {
-        // Load initial users for suggestions
+
         handleSearch('');
       } else {
-        // If switching to group creation, we might want to keep the current search or reset
-        // For now let's just ensure we have some users to show
         if (searchResults.length === 0) handleSearch('');
       }
     }
