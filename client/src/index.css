@@ -806,7 +806,7 @@ body {
 
 /* AI Sidebar */
 .ai-sidebar {
-  width: 320px;
+  width: 280px;
   background: var(--bg-sidebar);
   border-left: 1px solid var(--border-default);
   display: flex;
